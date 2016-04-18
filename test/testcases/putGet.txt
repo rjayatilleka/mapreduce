@@ -1,0 +1,7 @@
+getVersion localhost 50001 example.txt
+getContents localhost 50001 example.txt
+
+putFile localhost 50001 file 0 Hello
+
+getVersion localhost 50001 example.txt
+getContents localhost 50001 example.txt

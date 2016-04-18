@@ -1,0 +1,2 @@
+write example.txt Example content.
+read example.txt

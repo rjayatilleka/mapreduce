@@ -1,0 +1,9 @@
+.DS_Store
+build
+generated
+.idea
+bin
+dist
+logs
+log
+test/sample_data
