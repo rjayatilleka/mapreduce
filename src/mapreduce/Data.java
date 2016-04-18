@@ -2,6 +2,7 @@ package mapreduce;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,8 +19,14 @@ public class Data {
         return Files.newInputStream(p, StandardOpenOption.READ);
     }
 
-    public static String writeIntermediate(byte[] buf) {
-        UUID uuid = UUID.randomUUID();
-        Path p = INTERMEDIATES.resolve(uuid.toString());
+    public static String writeIntermediate(byte[] buf, int bytesBuffered) throws IOException {
+        String uuid = UUID.randomUUID().toString();
+        Path p = INTERMEDIATES.resolve(uuid);
+
+        try (OutputStream s = Files.newOutputStream(p, StandardOpenOption.CREATE_NEW)) {
+            s.write(buf, 0, bytesBuffered);
+        }
+
+        return uuid;
     }
 }

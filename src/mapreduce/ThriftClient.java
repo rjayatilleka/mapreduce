@@ -36,11 +36,11 @@ public class ThriftClient<T extends TServiceClient> {
         this.constructor = constructor;
     }
 
-    public static ThriftClient<MasterService.Client> makeCoordinatorClient(String hostname) {
+    public static ThriftClient<MasterService.Client> makeMasterClient(String hostname) {
         return new ThriftClient<>(hostname, 50000, MasterService.Client::new);
     }
 
-    public static ThriftClient<WorkerService.Client> makeStorageClient(String hostname, int port) {
+    public static ThriftClient<WorkerService.Client> makeWorkerClient(String hostname, int port) {
         return new ThriftClient<>(hostname, port, WorkerService.Client::new);
     }
 

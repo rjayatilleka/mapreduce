@@ -4,14 +4,17 @@ import mapreduce.Data;
 import mapreduce.thrift.MasterInfo;
 import mapreduce.thrift.MasterService;
 import org.apache.thrift.TException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
-import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MasterHandler implements MasterService.Iface {
+
+    private static final Logger log = LoggerFactory.getLogger(MasterHandler.class);
 
     private final MasterParameters params;
 
@@ -26,17 +29,20 @@ public class MasterHandler implements MasterService.Iface {
 
     @Override
     public void mergesort(String inputFilename) throws TException {
-        split(inputFilename);
+        for (String dataId : split(inputFilename)) {
+            log.info("split dataid = {}", dataId);
+        }
     }
 
-    public List<Path> split(String inputFilename) throws TException {
+    public List<String> split(String inputFilename) throws TException {
+        List<String> dataIds = new ArrayList<>();
+
         try {
             InputStream input = Data.readInput(inputFilename);
             byte[] buf = new byte[params.chunkSize + 1024];
-            int bytesBuffered = 0;
 
             while (true) {
-                bytesBuffered = 0;
+                int bytesBuffered = 0;
                 int bytesJustRead = input.read(buf, bytesBuffered, params.chunkSize);
 
                 if (bytesJustRead == -1) { // eof
@@ -55,11 +61,10 @@ public class MasterHandler implements MasterService.Iface {
                 }
 
                 // should have read space or be at eof now
-                String dataId = Data.writeIntermediate(buf);
-
+                dataIds.add(Data.writeIntermediate(buf, bytesBuffered));
             }
 
-
+            return dataIds;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -12,7 +12,7 @@ import mapreduce.thrift.MasterService;
 public class Commander {
 
     private final ThriftClient<MasterService.Client> masterClient =
-            ThriftClient.makeCoordinatorClient("localhost");
+            ThriftClient.makeMasterClient("localhost");
 
     public void masterInfo() {
         MasterInfo info = masterClient.with(client -> client.info());
@@ -22,6 +22,13 @@ public class Commander {
 
         System.out.println("\nWorker servers -------");
         info.servers.forEach(System.out::println);
+    }
+
+    public void mergesort(String[] command) {
+        String inputFilename = command[1];
+
+        masterClient.run(client -> client.mergesort(inputFilename));
+
     }
 
 

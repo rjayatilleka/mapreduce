@@ -23,7 +23,7 @@ public class MasterParameters {
     }
 
     public static MasterParameters parse(String[] args) {
-        int chunkSize = Integer.parseInt(args[0]) * 1024 * 1024;
+        int chunkSize = Integer.parseInt(args[0]);
         int redundancy = Integer.parseInt(args[1]);
         List<Address> servers = new ArrayList<>();
 

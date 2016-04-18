@@ -32,6 +32,9 @@ public class Client {
                 case "masterInfo":
                     commander.masterInfo();
                     break;
+                case "mergesort":
+                    commander.mergesort(command);
+                    break;
                 default:
                     throw new RuntimeException("Unknown command");
             }
