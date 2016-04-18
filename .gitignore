@@ -6,5 +6,7 @@ bin
 dist
 logs
 log
-test/sample_data
-work
+work/intermediate/*
+!work/intermediate/.token
+work/output/*
+!work/output/.token

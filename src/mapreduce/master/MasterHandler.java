@@ -1,8 +1,15 @@
 package mapreduce.master;
 
+import mapreduce.Data;
 import mapreduce.thrift.MasterInfo;
 import mapreduce.thrift.MasterService;
 import org.apache.thrift.TException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
+import java.nio.file.Path;
+import java.util.List;
 
 public class MasterHandler implements MasterService.Iface {
 
@@ -19,6 +26,42 @@ public class MasterHandler implements MasterService.Iface {
 
     @Override
     public void mergesort(String inputFilename) throws TException {
-        
+        split(inputFilename);
+    }
+
+    public List<Path> split(String inputFilename) throws TException {
+        try {
+            InputStream input = Data.readInput(inputFilename);
+            byte[] buf = new byte[params.chunkSize + 1024];
+            int bytesBuffered = 0;
+
+            while (true) {
+                bytesBuffered = 0;
+                int bytesJustRead = input.read(buf, bytesBuffered, params.chunkSize);
+
+                if (bytesJustRead == -1) { // eof
+                    break;
+                }
+                bytesBuffered += bytesJustRead;
+
+                while (buf[bytesBuffered - 1] != 32) { // didn't finish with space
+                    bytesJustRead = input.read(buf, bytesBuffered, 1);
+
+                    if (bytesJustRead == -1) { // eof
+                        break;
+                    } else {
+                        bytesBuffered += bytesJustRead;
+                    }
+                }
+
+                // should have read space or be at eof now
+                String dataId = Data.writeIntermediate(buf);
+
+            }
+
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

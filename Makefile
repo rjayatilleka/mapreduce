@@ -114,10 +114,7 @@ dist/log: | dist
 	@mkdir dist/log
 
 dist/work: | dist
-	@mkdir dist/work
-	@mkdir dist/work/input
-	@mkdir dist/work/intermediate
-	@mkdir dist/work/output
+	@cp -rf work dist/
 
 dist/log/metrics: | dist/log
 	@mkdir dist/log/metrics
