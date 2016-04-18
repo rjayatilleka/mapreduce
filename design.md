@@ -8,6 +8,7 @@ Worker: Fail probability
 - Design redundant task
 - Design job sort
 - Design job merge
+- Write interfaces
 
 ## TODOs
 
