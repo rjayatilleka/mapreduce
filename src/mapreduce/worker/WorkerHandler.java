@@ -31,7 +31,6 @@ public class WorkerHandler implements WorkerService.Iface {
 
     @Override
     public String runSort(String inputId) throws TException {
-        // read file
         try (InputStream input = Data.readIntermediate(inputId)) {
             Scanner s = new Scanner(input);
             int[] counts = new int[10000];

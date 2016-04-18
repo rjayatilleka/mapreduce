@@ -5,7 +5,6 @@ import mapreduce.ThriftClient;
 import mapreduce.thrift.MasterInfo;
 import mapreduce.thrift.MasterService;
 import mapreduce.thrift.WorkerInfo;
-import mapreduce.worker.Worker;
 
 /**
  * Given a line of input, handles various operations.
@@ -37,7 +36,7 @@ public class Commander {
         String host = command[1];
         int port = Integer.parseInt(command[2]);
 
-        WorkerInfo info = ThriftClient.makeWorkerClient(host, port).with(client -> client.info());
+        WorkerInfo info = ThriftClient.makeWorkerClient(0, host, port).with(client -> client.info());
 
         System.out.println("Name = " + info.workerId);
     }
@@ -47,7 +46,7 @@ public class Commander {
         int port = Integer.parseInt(command[2]);
         String inputId = command[3];
 
-        String outputId = ThriftClient.makeWorkerClient(host, port)
+        String outputId = ThriftClient.makeWorkerClient(0, host, port)
                 .with(client -> client.runSort(inputId));
 
         System.out.println("outputId = " + outputId);

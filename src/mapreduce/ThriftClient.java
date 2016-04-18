@@ -26,22 +26,26 @@ public class ThriftClient<T extends TServiceClient> {
 
     private static final Logger log = LoggerFactory.getLogger(ThriftClient.class);
 
+    private final int timeoutMs;
     private final String hostname;
     private final int port;
     private final Function<TBinaryProtocol, T> constructor;
 
-    public ThriftClient(String hostname, int port, Function<TBinaryProtocol, T> constructor) {
+    public ThriftClient(
+            int timeoutMs, String hostname, int port, Function<TBinaryProtocol, T> constructor) {
+        this.timeoutMs = timeoutMs;
         this.hostname = hostname;
         this.port = port;
         this.constructor = constructor;
     }
 
     public static ThriftClient<MasterService.Client> makeMasterClient(String hostname) {
-        return new ThriftClient<>(hostname, 50000, MasterService.Client::new);
+        return new ThriftClient<>(0, hostname, 50000, MasterService.Client::new);
     }
 
-    public static ThriftClient<WorkerService.Client> makeWorkerClient(String hostname, int port) {
-        return new ThriftClient<>(hostname, port, WorkerService.Client::new);
+    public static ThriftClient<WorkerService.Client> makeWorkerClient(
+            int timeoutMs, String hostname, int port) {
+        return new ThriftClient<>(timeoutMs, hostname, port, WorkerService.Client::new);
     }
 
     public <R> R retryWith(int retries, int delay, ThriftFunction<T, R> work) {
@@ -64,7 +68,7 @@ public class ThriftClient<T extends TServiceClient> {
     }
 
     public <R> R with(ThriftFunction<T, R> work) {
-        try (TTransport transport = new TSocket(hostname, port)) {
+        try (TTransport transport = new TSocket(hostname, port, timeoutMs, 0)) {
             transport.open();
             log.info("with, starting, host = {}, port = {}", hostname, port);
 

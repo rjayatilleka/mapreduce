@@ -10,15 +10,15 @@ Worker: Fail probability
 - Design job merge
 - Write interfaces
 - Make directories
+- Implement split
 - Implement sort
+- Implement timeout on thrift client
+- Make sure sort and merge work concurrently
 
 ## TODOs
 
 - Implement merge
-- Make sure sort and merge work concurrently
 - Add sort and merge fails
-- Implement timeout on thrift client
-- Implement split
 - Implement worker pool
 - Implement monitoring
 - Implement job sort
