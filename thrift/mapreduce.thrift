@@ -10,7 +10,9 @@ struct Address {
 }
 
 struct MasterInfo {
-  1:required list<Address> servers;
+  1:required i32 chunkSize;
+  2:required i32 redundancy;
+  3:required list<Address> servers;
 }
 
 service MasterService {

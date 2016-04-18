@@ -1,6 +1,5 @@
 package mapreduce.worker;
 
-import mapreduce.thrift.BusyException;
 import mapreduce.thrift.WorkerInfo;
 import mapreduce.thrift.WorkerService;
 import org.apache.thrift.TException;
@@ -18,17 +17,12 @@ public class WorkerHandler implements WorkerService.Iface {
     }
 
     @Override
-    public String runSort(String dataId) throws BusyException, TException {
+    public String runSort(String dataId) throws TException {
         return null;
     }
 
     @Override
-    public String runMerge(List<String> dataIds) throws BusyException, TException {
+    public String runMerge(List<String> dataIds) throws TException {
         return null;
-    }
-
-    @Override
-    public void cancel(String taskId) throws TException {
-
     }
 }

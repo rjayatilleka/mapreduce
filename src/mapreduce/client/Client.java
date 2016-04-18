@@ -29,6 +29,9 @@ public class Client {
 
         try {
             switch (command[0]) {
+                case "masterInfo":
+                    commander.masterInfo();
+                    break;
                 default:
                     throw new RuntimeException("Unknown command");
             }

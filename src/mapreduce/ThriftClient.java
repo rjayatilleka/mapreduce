@@ -1,5 +1,8 @@
 package mapreduce;
 
+import mapreduce.thrift.MasterService;
+import mapreduce.thrift.WorkerService;
+import mapreduce.worker.WorkerServer;
 import org.apache.thrift.TException;
 import org.apache.thrift.TServiceClient;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -31,6 +34,14 @@ public class ThriftClient<T extends TServiceClient> {
         this.hostname = hostname;
         this.port = port;
         this.constructor = constructor;
+    }
+
+    public static ThriftClient<MasterService.Client> makeCoordinatorClient(String hostname) {
+        return new ThriftClient<>(hostname, 50000, MasterService.Client::new);
+    }
+
+    public static ThriftClient<WorkerService.Client> makeStorageClient(String hostname, int port) {
+        return new ThriftClient<>(hostname, port, WorkerService.Client::new);
     }
 
     public <R> R retryWith(int retries, int delay, ThriftFunction<T, R> work) {

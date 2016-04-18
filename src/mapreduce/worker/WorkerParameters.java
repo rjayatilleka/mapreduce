@@ -1,21 +1,25 @@
 package mapreduce.worker;
 
-import java.util.UUID;
-
+/**
+ * Usage: <hostname> <port> <fail percent>
+ */
 public class WorkerParameters {
 
-    public final UUID workerId;
+    public final String hostname;
+    public final int port;
     public final int failPercent;
 
-    public WorkerParameters(UUID workerId, int failPercent) {
-        this.workerId = workerId;
+    public WorkerParameters(String hostname, int port, int failPercent) {
+        this.hostname = hostname;
+        this.port = port;
         this.failPercent = failPercent;
     }
 
     public static WorkerParameters parse(String[] args) {
-        UUID workerId = UUID.fromString(args[0]);
-        int failPercent = Integer.parseInt(args[1]);
+        String hostname = args[0];
+        int port = Integer.parseInt(args[1]);
+        int failPercent = Integer.parseInt(args[2]);
 
-        return new WorkerParameters(workerId, failPercent);
+        return new WorkerParameters(hostname, port, failPercent);
     }
 }
