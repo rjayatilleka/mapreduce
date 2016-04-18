@@ -19,14 +19,17 @@ public class Data {
         return Files.newInputStream(p, StandardOpenOption.READ);
     }
 
-    public static String writeIntermediate(byte[] buf, int bytesBuffered) throws IOException {
-        String uuid = UUID.randomUUID().toString();
-        Path p = INTERMEDIATES.resolve(uuid);
+    public static String newIntermediate() throws IOException {
+        return UUID.randomUUID().toString();
+    }
 
-        try (OutputStream s = Files.newOutputStream(p, StandardOpenOption.CREATE_NEW)) {
-            s.write(buf, 0, bytesBuffered);
-        }
+    public static InputStream readIntermediate(String filename) throws IOException {
+        Path p = INTERMEDIATES.resolve(filename);
+        return Files.newInputStream(p, StandardOpenOption.READ);
+    }
 
-        return uuid;
+    public static OutputStream writeIntermediate(String dataId) throws IOException {
+        Path p = INTERMEDIATES.resolve(dataId);
+        return Files.newOutputStream(p, StandardOpenOption.CREATE_NEW);
     }
 }

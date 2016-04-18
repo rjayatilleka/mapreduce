@@ -35,6 +35,12 @@ public class Client {
                 case "mergesort":
                     commander.mergesort(command);
                     break;
+                case "workerInfo":
+                    commander.workerInfo(command);
+                    break;
+                case "runSort":
+                    commander.runSort(command);
+                    break;
                 default:
                     throw new RuntimeException("Unknown command");
             }

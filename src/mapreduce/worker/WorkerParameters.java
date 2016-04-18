@@ -5,12 +5,12 @@ package mapreduce.worker;
  */
 public class WorkerParameters {
 
-    public final String hostname;
+    public final String name;
     public final int port;
     public final int failPercent;
 
     public WorkerParameters(String hostname, int port, int failPercent) {
-        this.hostname = hostname;
+        this.name = hostname + "-" + port;
         this.port = port;
         this.failPercent = failPercent;
     }

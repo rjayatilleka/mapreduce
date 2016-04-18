@@ -3,7 +3,9 @@ SHELL = /bin/bash
 all: build/mapreduce binaries distribution
 
 clean:
-	@rm -rf generated build bin dist logs
+	@rm -rf generated build bin dist logs work/intermediate/* work/output/*
+	@touch work/intermediate/.token
+	@touch work/output/.token
 
 install: uninstall
 	@cp -rf dist ~/jaya0089-mapreduce
@@ -83,13 +85,17 @@ define binary
 @chmod +x $@
 endef
 
-binaries: bin/orchestrator bin/client bin/master
+binaries: bin/orchestrator bin/client bin/master bin/worker
 
 bin:
 	@mkdir bin
 
 bin/master: main = mapreduce.master.Master
 bin/master: | bin
+	$(binary)
+
+bin/worker: main = mapreduce.worker.Worker
+bin/worker: | bin
 	$(binary)
 
 bin/client: main = mapreduce.client.Client

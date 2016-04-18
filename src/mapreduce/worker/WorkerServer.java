@@ -24,7 +24,7 @@ public class WorkerServer implements Runnable {
             WorkerService.Processor<WorkerHandler> processor =
                     new WorkerService.Processor<>(new WorkerHandler(params));
 
-            TServerTransport transport = new TServerSocket(50000);
+            TServerTransport transport = new TServerSocket(params.port);
             TThreadPoolServer.Args args = new TThreadPoolServer.Args(transport)
                     .maxWorkerThreads(3000)
                     .processor(processor);

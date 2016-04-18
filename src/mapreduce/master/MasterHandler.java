@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,8 +38,7 @@ public class MasterHandler implements MasterService.Iface {
     public List<String> split(String inputFilename) throws TException {
         List<String> dataIds = new ArrayList<>();
 
-        try {
-            InputStream input = Data.readInput(inputFilename);
+        try (InputStream input = Data.readInput(inputFilename)) {
             byte[] buf = new byte[params.chunkSize + 1024];
 
             while (true) {
@@ -61,7 +61,11 @@ public class MasterHandler implements MasterService.Iface {
                 }
 
                 // should have read space or be at eof now
-                dataIds.add(Data.writeIntermediate(buf, bytesBuffered));
+                String dataId = Data.newIntermediate();
+                try (OutputStream o = Data.writeIntermediate(dataId)) {
+                    o.write(buf, 0, bytesBuffered);
+                }
+                dataIds.add(dataId);
             }
 
             return dataIds;
