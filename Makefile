@@ -105,13 +105,19 @@ bin/orchestrator: test/orchestrator.py | bin
 #### ------------------------------------------------------
 #### ----- Distribution -----------------------------------
 
-distribution: dist/log dist/log/metrics dist/lib dist/test dist/bin dist/build
+distribution: dist/log dist/log/metrics dist/lib dist/test dist/bin dist/build dist/work
 
 dist:
 	@mkdir dist
 
 dist/log: | dist
 	@mkdir dist/log
+
+dist/work: | dist
+	@mkdir dist/work
+	@mkdir dist/work/input
+	@mkdir dist/work/intermediate
+	@mkdir dist/work/output
 
 dist/log/metrics: | dist/log
 	@mkdir dist/log/metrics
