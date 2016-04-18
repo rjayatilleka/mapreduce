@@ -9,11 +9,10 @@ Worker: Fail probability
 - Design job sort
 - Design job merge
 - Write interfaces
+- Make directories
 
 ## TODOs
 
-- Make directories
-- Make interfaces
 - Implement sort
 - Implement merge
 - Make sure sort and merge work concurrently
