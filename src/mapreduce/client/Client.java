@@ -41,6 +41,9 @@ public class Client {
                 case "runSort":
                     commander.runSort(command);
                     break;
+                case "runMerge":
+                    commander.runMerge(command);
+                    break;
                 default:
                     throw new RuntimeException("Unknown command");
             }

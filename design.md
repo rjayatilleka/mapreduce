@@ -14,10 +14,10 @@ Worker: Fail probability
 - Implement sort
 - Implement timeout on thrift client
 - Make sure sort and merge work concurrently
+- Implement merge
 
 ## TODOs
 
-- Implement merge
 - Add sort and merge fails
 - Implement worker pool
 - Implement monitoring
@@ -27,8 +27,6 @@ Worker: Fail probability
 - Add logging
 - Make remote-install
 - Do evaluation
-
-
 
 ## Job sort
 

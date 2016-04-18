@@ -10,6 +10,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.UUID;
 
 public class Data {
+
     private static final Path INPUTS = Paths.get("work/input");
     private static final Path INTERMEDIATES = Paths.get("work/intermediate");
     private static final Path OUTPUTS = Paths.get("work/output");
