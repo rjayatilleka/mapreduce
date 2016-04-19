@@ -15,10 +15,10 @@ Worker: Fail probability
 - Implement timeout on thrift client
 - Make sure sort and merge work concurrently
 - Implement merge
+- Add sort and merge fails
 
 ## TODOs
 
-- Add sort and merge fails
 - Implement worker pool
 - Implement monitoring
 - Implement job sort
