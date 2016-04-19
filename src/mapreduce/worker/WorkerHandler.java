@@ -19,7 +19,7 @@ import java.util.Scanner;
 public class WorkerHandler implements WorkerService.Iface {
 
     private static final Logger log = LoggerFactory.getLogger(WorkerHandler.class);
-    private static final int MAX_DATA = 10000;
+    public static final int MAX_DATA = 10000;
 
     private final WorkerParameters params;
     private final Random random;
@@ -93,7 +93,7 @@ public class WorkerHandler implements WorkerService.Iface {
     }
 
     private static String writeData(int[] counts) throws IOException{
-        String outputId = Data.newIntermediate();
+        String outputId = Data.newID();
 
         try (OutputStream output = Data.writeIntermediate(outputId)) {
             PrintWriter writer = new PrintWriter(output);

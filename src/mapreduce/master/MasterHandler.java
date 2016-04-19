@@ -1,10 +1,9 @@
 package mapreduce.master;
 
 import mapreduce.Data;
-import mapreduce.ThriftClient;
 import mapreduce.thrift.MasterInfo;
 import mapreduce.thrift.MasterService;
-import mapreduce.thrift.WorkerService;
+import mapreduce.worker.WorkerHandler;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +12,10 @@ import rx.Observable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -52,19 +53,50 @@ public class MasterHandler implements MasterService.Iface {
 
         int mergeRounds = (int) Math.ceil(Math.log(count) / Math.log(params.chunksPerMerge)) + 1;
 
-        String mergedId = Observable.just(1)
+        String expandedId = Observable.just(1)
                 .repeat(mergeRounds)
                 .reduce(sortedIds, (unmergedIds, i) -> unmergedIds
                         .buffer(params.chunksPerMerge)
                         .map(this::mergeRequest)
                         .flatMap(this::retryAndRedundant))
                 .flatMap(x -> x)
+                .map(this::expand)
                 .toBlocking()
                 .first();
 
-        log.info("mergesort, merged, mergedId = {}", mergedId);
+        log.info("mergesort, done, outputId = {}", expandedId);
 
-        return "";
+        return expandedId;
+    }
+
+    private String expand(String inputId) {
+        try {
+            String outputId = Data.newID();
+
+            try (
+                    InputStream input = Data.readIntermediate(inputId);
+                    OutputStream output = Data.writeOutput(outputId)
+            ) {
+                Scanner s = new Scanner(input);
+                PrintWriter w = new PrintWriter(output);
+
+                for (int i = 0; i < WorkerHandler.MAX_DATA; i++) {
+                    int count = Integer.parseInt(s.nextLine());
+
+                    for (int j = 0; j < count; j++) {
+                        w.print(i);
+                        w.print(" ");
+                    }
+
+                    w.flush();
+                }
+            }
+
+            Data.truncateEndSpace(outputId);
+            return outputId;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Observable<String> retryAndRedundant(Observable<String> unreliable) {
@@ -116,7 +148,7 @@ public class MasterHandler implements MasterService.Iface {
                 }
 
                 // should have read space or be at eof now
-                String dataId = Data.newIntermediate();
+                String dataId = Data.newID();
                 try (OutputStream o = Data.writeIntermediate(dataId)) {
                     o.write(buf, 0, bytesBuffered);
                 }
