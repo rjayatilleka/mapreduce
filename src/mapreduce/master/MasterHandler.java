@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 public class MasterHandler implements MasterService.Iface {
 
@@ -44,19 +43,26 @@ public class MasterHandler implements MasterService.Iface {
         log.info("mergesort, received, inputFilename = {}", inputFilename);
 
         List<String> splits = split(inputFilename);
-        log.info("mergesort, split, count = {}", splits.size());
+        int count = splits.size();
+        log.info("mergesort, split, count = {}", count);
 
-        List<String> sortedIds = Observable.merge(
-                Observable.from(splits)
-                        .map(this::sortRequest)
-                        .map(this::retryAndRedundant))
-                .toList()
+        Observable<String> sortedIds = Observable.from(splits)
+                .map(this::sortRequest)
+                .flatMap(this::retryAndRedundant);
+
+        int mergeRounds = (int) Math.ceil(Math.log(count) / Math.log(params.chunksPerMerge)) + 1;
+
+        String mergedId = Observable.just(1)
+                .repeat(mergeRounds)
+                .reduce(sortedIds, (unmergedIds, i) -> unmergedIds
+                        .buffer(params.chunksPerMerge)
+                        .map(this::mergeRequest)
+                        .flatMap(this::retryAndRedundant))
+                .flatMap(x -> x)
                 .toBlocking()
                 .first();
 
-        log.info("mergesort, sorted, count = {}", sortedIds.size());
-        for (String sortedId : sortedIds)
-            log.info("mergesort, sorted, id = {}", sortedId);
+        log.info("mergesort, merged, mergedId = {}", mergedId);
 
         return "";
     }
@@ -72,6 +78,14 @@ public class MasterHandler implements MasterService.Iface {
         return Observable.just(1)
                 .map(i -> pool.getWorker(0))
                 .map(c -> (Callable<String>) () -> c.with(client -> client.runSort(inputId)))
+                .map(executor::submit)
+                .flatMap(Observable::from);
+    }
+
+    private Observable<String> mergeRequest(List<String> inputIds) {
+        return Observable.just(1)
+                .map(i -> pool.getWorker(0))
+                .map(c -> (Callable<String>) () -> c.with(client -> client.runMerge(inputIds)))
                 .map(executor::submit)
                 .flatMap(Observable::from);
     }

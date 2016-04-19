@@ -20,10 +20,10 @@ Worker: Fail probability
 - Implement monitoring
 - Implement job sort
   - Make sure job sort works with fails
+- Implement job merge
 
 ## TODOs
 
-- Implement job merge
 - Implement expand
 - Add logging
 - Make remote-install
