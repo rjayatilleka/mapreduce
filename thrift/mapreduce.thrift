@@ -24,9 +24,12 @@ struct WorkerInfo {
   1:required string workerId;
 }
 
+exception TaskFailException {
+}
+
 service WorkerService {
   WorkerInfo info(),
-  string runSort(1:string dataId),
-  string runMerge(1:list<string> dataIds)
+  string runSort(1:string dataId) throws (1:TaskFailException e),
+  string runMerge(1:list<string> dataIds) throws (1:TaskFailException e)
 }
 

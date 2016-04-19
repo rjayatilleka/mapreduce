@@ -1,6 +1,7 @@
 package mapreduce.worker;
 
 import mapreduce.Data;
+import mapreduce.thrift.TaskFailException;
 import mapreduce.thrift.WorkerInfo;
 import mapreduce.thrift.WorkerService;
 import org.apache.thrift.TException;
@@ -12,6 +13,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
 
 public class WorkerHandler implements WorkerService.Iface {
@@ -20,9 +22,11 @@ public class WorkerHandler implements WorkerService.Iface {
     private static final int MAX_DATA = 10000;
 
     private final WorkerParameters params;
+    private final Random random;
 
     public WorkerHandler(WorkerParameters params) {
         this.params = params;
+        this.random = new Random();
     }
 
     @Override
@@ -33,6 +37,7 @@ public class WorkerHandler implements WorkerService.Iface {
     @Override
     public String runSort(String inputId) throws TException {
         log.info("runSort, received");
+        checkTaskFailure("runSort");
 
         try (InputStream input = Data.readIntermediate(inputId)) {
             Scanner s = new Scanner(input);
@@ -53,6 +58,7 @@ public class WorkerHandler implements WorkerService.Iface {
     @Override
     public String runMerge(List<String> dataIds) throws TException {
         log.info("runMerge, received");
+        checkTaskFailure("runMerge");
 
         try {
             int[] counts = new int[MAX_DATA];
@@ -70,6 +76,13 @@ public class WorkerHandler implements WorkerService.Iface {
             return writeData(counts);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void checkTaskFailure(String method) throws TaskFailException {
+        if (random.nextInt(100) < params.failPercent) {
+            log.info("{}, task failure", method);
+            throw new TaskFailException();
         }
     }
 
