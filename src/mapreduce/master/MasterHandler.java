@@ -1,17 +1,24 @@
 package mapreduce.master;
 
 import mapreduce.Data;
+import mapreduce.ThriftClient;
 import mapreduce.thrift.MasterInfo;
 import mapreduce.thrift.MasterService;
+import mapreduce.thrift.WorkerService;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rx.Observable;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class MasterHandler implements MasterService.Iface {
 
@@ -19,6 +26,7 @@ public class MasterHandler implements MasterService.Iface {
 
     private final MasterParameters params;
     private final WorkerPool pool;
+    private final ExecutorService executor = Executors.newFixedThreadPool(30);
 
     public MasterHandler(MasterParameters params, WorkerPool pool) {
         this.params = params;
@@ -27,17 +35,48 @@ public class MasterHandler implements MasterService.Iface {
 
     @Override
     public MasterInfo info() throws TException {
+        log.info("info, received");
         return new MasterInfo(params.chunkSize, params.redundancy, params.servers);
     }
 
     @Override
-    public void mergesort(String inputFilename) throws TException {
-        for (String dataId : split(inputFilename)) {
-            log.info("split dataid = {}", dataId);
-        }
+    public String mergesort(String inputFilename) throws TException {
+        log.info("mergesort, received, inputFilename = {}", inputFilename);
+
+        List<String> splits = split(inputFilename);
+        log.info("mergesort, split, count = {}", splits.size());
+
+        List<String> sortedIds = Observable.merge(
+                Observable.from(splits)
+                        .map(this::sortRequest)
+                        .map(this::retryAndRedundant))
+                .toList()
+                .toBlocking()
+                .first();
+
+        log.info("mergesort, sorted, count = {}", sortedIds.size());
+        for (String sortedId : sortedIds)
+            log.info("mergesort, sorted, id = {}", sortedId);
+
+        return "";
     }
 
-    public List<String> split(String inputFilename) throws TException {
+    private Observable<String> retryAndRedundant(Observable<String> unreliable) {
+        return Observable.just(1)
+                .repeat(params.redundancy)
+                .flatMap(i -> unreliable.retry())
+                .take(1);
+    }
+
+    private Observable<String> sortRequest(final String inputId) {
+        return Observable.just(1)
+                .map(i -> pool.getWorker(0))
+                .map(c -> (Callable<String>) () -> c.with(client -> client.runSort(inputId)))
+                .map(executor::submit)
+                .flatMap(Observable::from);
+    }
+
+    private List<String> split(String inputFilename) throws TException {
         List<String> dataIds = new ArrayList<>();
 
         try (InputStream input = Data.readInput(inputFilename)) {

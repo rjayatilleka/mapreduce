@@ -2,8 +2,11 @@ SHELL = /bin/bash
 
 all: build/mapreduce binaries distribution
 
-clean:
-	@rm -rf generated build bin dist logs work/intermediate/* work/output/*
+clean: clean-output
+	@rm -rf generated build bin dist logs
+
+clean-output:
+	@rm -rf work/intermediate/* work/output/*
 	@touch work/intermediate/.token
 	@touch work/output/.token
 
@@ -23,7 +26,7 @@ test-output:
 	@rm -rf /tmp/testlogs
 	@scp -r cselabs:~/logs /tmp/testlogs
 
-.PHONY: clean install uninstall remote-takelogs remote-client distribution
+.PHONY: clean clean-output install uninstall remote-takelogs remote-client distribution
 
 
 #### ------------------------------------------------------

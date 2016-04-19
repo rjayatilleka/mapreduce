@@ -17,7 +17,7 @@ struct MasterInfo {
 
 service MasterService {
   MasterInfo info(),
-  void mergesort(1:string inputFilename)
+  string mergesort(1:string inputFilename)
 }
 
 struct WorkerInfo {

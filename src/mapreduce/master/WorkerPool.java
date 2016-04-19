@@ -49,13 +49,13 @@ public class WorkerPool {
                 .subscribe(status -> this.setWorker(w, status));
     }
 
-    public Address getWorker() {
+    public ThriftClient<WorkerService.Client> getWorker(int timeoutMs) {
         while (true) {
             Address w = workers.get(random.nextInt(count));
 
             if (accessible.get(w)) {
                 log.info("getWorker, found worker, w = {}", w);
-                return w;
+                return ThriftClient.makeWorkerClient(timeoutMs, w.hostname, w.port);
             } else {
                 log.info("getWorker, bad worker, w = {}", w);
             }

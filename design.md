@@ -18,14 +18,16 @@ Worker: Fail probability
 - Add sort and merge fails
 - Implement worker pool
 - Implement monitoring
+- Implement job sort
+  - Make sure job sort works with fails
 
 ## TODOs
 
-- Implement job sort
-  - Make sure job sort works with fails
 - Implement job merge
+- Implement expand
 - Add logging
 - Make remote-install
+- Make testing harness
 - Do evaluation
 
 ## Job sort
