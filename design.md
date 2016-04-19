@@ -21,11 +21,12 @@ Worker: Fail probability
 - Implement job sort
   - Make sure job sort works with fails
 - Implement job merge
+- Implement expand
+- Add logging
 
 ## TODOs
 
-- Implement expand
-- Add logging
+- Add metrics
 - Make remote-install
 - Make testing harness
 - Do evaluation
