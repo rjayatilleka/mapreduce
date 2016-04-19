@@ -20,7 +20,7 @@ public class WorkerPool {
     private final ConcurrentHashMap<Address, Boolean> accessible = new ConcurrentHashMap<>();
     private final Random random = new Random();
 
-    private final ExecutorService executor = Executors.newFixedThreadPool(5);
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public WorkerPool(List<Address> workers) {
         this.count = workers.size();
@@ -45,6 +45,7 @@ public class WorkerPool {
                     Observable.from(future)
                             .map(o -> true)
                             .onErrorReturn(e -> false))
+                .distinctUntilChanged()
                 .subscribe(status -> this.setWorker(w, status));
     }
 
@@ -62,6 +63,7 @@ public class WorkerPool {
     }
 
     public void setWorker(Address w, boolean status) {
+        log.info("setWorker, w = {}, status = {}", w, status);
         accessible.put(w, status);
     }
 }

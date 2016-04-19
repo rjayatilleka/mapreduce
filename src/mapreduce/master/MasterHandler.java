@@ -18,9 +18,11 @@ public class MasterHandler implements MasterService.Iface {
     private static final Logger log = LoggerFactory.getLogger(MasterHandler.class);
 
     private final MasterParameters params;
+    private final WorkerPool pool;
 
-    public MasterHandler(MasterParameters params) {
+    public MasterHandler(MasterParameters params, WorkerPool pool) {
         this.params = params;
+        this.pool = pool;
     }
 
     @Override

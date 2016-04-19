@@ -2,7 +2,6 @@ package mapreduce;
 
 import mapreduce.thrift.MasterService;
 import mapreduce.thrift.WorkerService;
-import mapreduce.worker.WorkerServer;
 import org.apache.thrift.TException;
 import org.apache.thrift.TServiceClient;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -70,14 +69,14 @@ public class ThriftClient<T extends TServiceClient> {
     public <R> R with(ThriftFunction<T, R> work) {
         try (TTransport transport = new TSocket(hostname, port, timeoutMs, 0)) {
             transport.open();
-            log.info("with, starting, host = {}, port = {}", hostname, port);
+            //log.info("with, starting, host = {}, port = {}", hostname, port);
 
             T client = constructor.apply(new TBinaryProtocol(transport));
-            log.info("with, made client");
+            //log.info("with, made client");
 
             return work.apply(client);
         } catch (TException e) {
-            log.info("with, failed, host = {}, port = {}", hostname, port, e);
+            //log.info("with, failed, host = {}, port = {}", hostname, port, e);
             throw new RuntimeException(e);
         }
     }

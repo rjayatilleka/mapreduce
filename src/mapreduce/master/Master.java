@@ -5,6 +5,7 @@ public class Master {
     public static void main(String[] args) {
         MasterParameters params = MasterParameters.parse(args);
 
-        new Thread(new MasterServer(params)).run();
+        WorkerPool pool = new WorkerPool(params.servers);
+        new Thread(new MasterServer(params, pool)).run();
     }
 }

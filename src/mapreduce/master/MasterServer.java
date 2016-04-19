@@ -13,16 +13,18 @@ public class MasterServer implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(MasterServer.class);
 
     private final MasterParameters params;
+    private final WorkerPool pool;
 
-    public MasterServer(MasterParameters params) {
+    public MasterServer(MasterParameters params, WorkerPool pool) {
         this.params = params;
+        this.pool = pool;
     }
 
     @Override
     public void run() {
         try {
             MasterService.Processor<MasterHandler> processor =
-                    new MasterService.Processor<>(new MasterHandler(params));
+                    new MasterService.Processor<>(new MasterHandler(params, pool));
 
             TServerTransport transport = new TServerSocket(50000);
             TThreadPoolServer.Args args = new TThreadPoolServer.Args(transport)
