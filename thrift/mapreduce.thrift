@@ -28,6 +28,7 @@ exception TaskFailException {
 }
 
 service WorkerService {
+  void heartbeat(),
   WorkerInfo info(),
   string runSort(1:string dataId) throws (1:TaskFailException e),
   string runMerge(1:list<string> dataIds) throws (1:TaskFailException e)

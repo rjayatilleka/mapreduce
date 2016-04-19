@@ -1,12 +1,15 @@
 package mapreduce.master;
 
+import mapreduce.ThriftClient;
 import mapreduce.thrift.Address;
+import mapreduce.thrift.WorkerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rx.Observable;
 
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
 public class WorkerPool {
 
@@ -17,13 +20,32 @@ public class WorkerPool {
     private final ConcurrentHashMap<Address, Boolean> accessible = new ConcurrentHashMap<>();
     private final Random random = new Random();
 
+    private final ExecutorService executor = Executors.newFixedThreadPool(5);
+
     public WorkerPool(List<Address> workers) {
         this.count = workers.size();
         this.workers = workers;
 
         for (Address w : workers) {
             this.accessible.put(w, Boolean.TRUE);
+            startMonitor(w);
         }
+    }
+
+    private void startMonitor(final Address w) {
+        ThriftClient<WorkerService.Client> c =
+                ThriftClient.makeWorkerClient(100, w.hostname, w.port);
+
+        Runnable heartbeat = () -> c.run(client -> client.heartbeat());
+
+        Observable.interval(1000, TimeUnit.MILLISECONDS)
+                .map(i -> heartbeat)
+                .map(executor::submit)
+                .flatMap(future ->
+                    Observable.from(future)
+                            .map(o -> true)
+                            .onErrorReturn(e -> false))
+                .subscribe(status -> this.setWorker(w, status));
     }
 
     public Address getWorker() {

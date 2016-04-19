@@ -30,7 +30,13 @@ public class WorkerHandler implements WorkerService.Iface {
     }
 
     @Override
+    public void heartbeat() throws TException {
+        log.info("heartbeat, received");
+    }
+
+    @Override
     public WorkerInfo info() throws TException {
+        log.info("info, received");
         return new WorkerInfo(params.name);
     }
 
