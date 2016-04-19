@@ -16,11 +16,11 @@ Worker: Fail probability
 - Make sure sort and merge work concurrently
 - Implement merge
 - Add sort and merge fails
+- Implement worker pool
+- Implement monitoring
 
 ## TODOs
 
-- Implement worker pool
-- Implement monitoring
 - Implement job sort
   - Make sure job sort works with fails
 - Implement job merge
