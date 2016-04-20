@@ -27,6 +27,7 @@ Worker: Fail probability
 ## TODOs
 
 - Add metrics
+  - Time for mergesort (also print)
 - Make remote-install
 - Make testing harness
 - Do evaluation
