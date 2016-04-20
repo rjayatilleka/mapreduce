@@ -3,6 +3,7 @@ package mapreduce.worker;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import mapreduce.Data;
+import mapreduce.Metrics;
 import mapreduce.thrift.TaskFailException;
 import mapreduce.thrift.WorkerInfo;
 import mapreduce.thrift.WorkerService;
@@ -32,9 +33,9 @@ public class WorkerHandler implements WorkerService.Iface {
         this.params = params;
         this.random = new Random();
 
-        this.sortTimer = Worker.METRICS.timer(
+        this.sortTimer = Metrics.METRICS.timer(
                 MetricRegistry.name(WorkerHandler.class, "sort-time"));
-        this.mergeTimer = Worker.METRICS.timer(
+        this.mergeTimer = Metrics.METRICS.timer(
                 MetricRegistry.name(WorkerHandler.class, "merge-time"));
     }
 
