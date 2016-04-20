@@ -23,9 +23,6 @@ Worker: Fail probability
 - Implement job merge
 - Implement expand
 - Add logging
-
-## TODOs
-
 - Add metrics
   - master
     - Time elapsed (also print)
@@ -33,6 +30,9 @@ Worker: Fail probability
     - Total failed tasks
   - compute node
     - average task time per sort/merge
+
+## TODOs
+
 - Make remote-install
 - Make testing harness
 - Do evaluation

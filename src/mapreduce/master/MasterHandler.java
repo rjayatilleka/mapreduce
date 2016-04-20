@@ -105,7 +105,7 @@ public class MasterHandler implements MasterService.Iface {
         return Observable.just(1)
                 .repeat(params.redundancy)
                 .flatMap(i -> unreliable
-                        .doOnError(e -> log.error("rAndR, error", e))
+                        .doOnError(e -> log.error("request, error = {}", e.getMessage()))
                         .retry())
                 .take(1);
     }

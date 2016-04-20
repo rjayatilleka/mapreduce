@@ -54,10 +54,10 @@ public class WorkerPool {
             Address w = workers.get(random.nextInt(count));
 
             if (accessible.get(w)) {
-                log.info("getWorker, found worker, w = {}", w);
+                //log.info("getWorker, found worker, w = {}", w);
                 return ThriftClient.makeWorkerClient(timeoutMs, w.hostname, w.port);
             } else {
-                log.info("getWorker, bad worker, w = {}", w);
+                //log.info("getWorker, bad worker, w = {}", w);
             }
         }
     }
