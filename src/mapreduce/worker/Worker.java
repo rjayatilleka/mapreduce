@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Worker {
 
-    private static final MetricRegistry METRICS = new MetricRegistry();
+    public static final MetricRegistry METRICS = new MetricRegistry();
 
     public static void main(String[] args) throws IOException {
         WorkerParameters params = WorkerParameters.parse(args);

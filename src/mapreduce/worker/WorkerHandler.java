@@ -1,5 +1,7 @@
 package mapreduce.worker;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import mapreduce.Data;
 import mapreduce.thrift.TaskFailException;
 import mapreduce.thrift.WorkerInfo;
@@ -24,9 +26,16 @@ public class WorkerHandler implements WorkerService.Iface {
     private final WorkerParameters params;
     private final Random random;
 
+    private final Timer sortTimer, mergeTimer;
+
     public WorkerHandler(WorkerParameters params) {
         this.params = params;
         this.random = new Random();
+
+        this.sortTimer = Worker.METRICS.timer(
+                MetricRegistry.name(WorkerHandler.class, "sort-time"));
+        this.mergeTimer = Worker.METRICS.timer(
+                MetricRegistry.name(WorkerHandler.class, "merge-time"));
     }
 
     @Override
@@ -45,7 +54,10 @@ public class WorkerHandler implements WorkerService.Iface {
         log.info("runSort, received");
         checkTaskFailure("runSort");
 
-        try (InputStream input = Data.readIntermediate(inputId)) {
+        try (
+                Timer.Context ignored = sortTimer.time();
+                InputStream input = Data.readIntermediate(inputId)
+        ) {
             Scanner s = new Scanner(input);
             int[] counts = new int[MAX_DATA];
 
@@ -66,7 +78,7 @@ public class WorkerHandler implements WorkerService.Iface {
         log.info("runMerge, received");
         checkTaskFailure("runMerge");
 
-        try {
+        try (Timer.Context ignored = mergeTimer.time()) {
             int[] counts = new int[MAX_DATA];
 
             for (String inputId : dataIds) {
