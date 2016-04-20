@@ -31,8 +31,12 @@ public class Commander {
     public void mergesort(String[] command) {
         String inputFilename = command[1];
 
-        masterClient.run(client -> client.mergesort(inputFilename));
+        String outputId = masterClient.with(client -> client.mergesort(inputFilename));
 
+        System.out.println("Output file = work/output/" + outputId);
+        System.out.println("\nDiff command =");
+        System.out.print("diff work/input/" + inputFilename + "_sorted ");
+        System.out.println("work/output/" + outputId);
     }
 
     public void workerInfo(String[] command) {

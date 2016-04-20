@@ -25,7 +25,6 @@ import java.util.Scanner;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class MasterHandler implements MasterService.Iface {
@@ -105,7 +104,9 @@ public class MasterHandler implements MasterService.Iface {
     private Observable<String> retryAndRedundant(Observable<String> unreliable) {
         return Observable.just(1)
                 .repeat(params.redundancy)
-                .flatMap(i -> unreliable.retry())
+                .flatMap(i -> unreliable
+                        .doOnError(e -> log.error("rAndR, error", e))
+                        .retry())
                 .take(1);
     }
 
@@ -123,7 +124,7 @@ public class MasterHandler implements MasterService.Iface {
             Meters meters,
             Function<ThriftClient<WorkerService.Client>, Callable<String>> makeTask) {
         return Observable.just(1)
-                .map(i -> pool.getWorker(100))
+                .map(i -> pool.getWorker(10000))
                 .map(makeTask::apply)
                 .map(executor::submit)
                 .doOnNext(c -> meters.totalTasksCounter.inc())
