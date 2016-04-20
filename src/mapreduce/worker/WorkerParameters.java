@@ -25,7 +25,6 @@ public class WorkerParameters {
         String hostname = s.nextLine();
         s.close();
 
-        System.out.println("got hostname " + hostname);
         int port = Integer.parseInt(args[0]);
         int failPercent = Integer.parseInt(args[1]);
 
