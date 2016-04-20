@@ -33,7 +33,6 @@ Worker: Fail probability
 
 ## TODOs
 
-- Make remote-install
 - Make testing harness
 - Do evaluation
 

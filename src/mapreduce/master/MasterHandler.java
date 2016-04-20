@@ -107,6 +107,7 @@ public class MasterHandler implements MasterService.Iface {
                 .flatMap(i -> unreliable
                         .doOnError(e -> log.error("request, error = {}", e.getMessage()))
                         .retry())
+                .doOnNext(n -> log.info("request, worked, id = {}", n))
                 .take(1);
     }
 
