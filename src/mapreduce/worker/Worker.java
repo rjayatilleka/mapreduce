@@ -16,7 +16,7 @@ public class Worker {
     public static void main(String[] args) throws IOException {
         WorkerParameters params = WorkerParameters.parse(args);
 
-        new Thread(new WorkerServer(params)).run();
+        new Thread(new WorkerServer(params)).start();
 
         setupMetrics(params.name);
     }

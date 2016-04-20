@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Usage: <MB chunk size> <chunks per merge> <redundancy> [<server>]...
+ * Usage: <chunk size> <chunks per merge> <redundancy> [<server>]...
  */
 public class MasterParameters {
 
