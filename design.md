@@ -27,7 +27,12 @@ Worker: Fail probability
 ## TODOs
 
 - Add metrics
-  - Time for mergesort (also print)
+  - master
+    - Time elapsed (also print)
+    - Total redundant tasks
+    - Total failed tasks
+  - compute node
+    - average task time per sort/merge
 - Make remote-install
 - Make testing harness
 - Do evaluation
