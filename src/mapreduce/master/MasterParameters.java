@@ -16,6 +16,7 @@ public class MasterParameters {
     public final int chunksPerMerge;
     public final int redundancy;
     public final List<Address> servers;
+    public final String name = "master";
 
     public MasterParameters(
             int chunkSize, int chunksPerMerge, int redundancy, List<Address> servers) {

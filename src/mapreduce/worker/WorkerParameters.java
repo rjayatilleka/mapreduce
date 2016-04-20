@@ -1,7 +1,10 @@
 package mapreduce.worker;
 
+import java.io.IOException;
+import java.util.Scanner;
+
 /**
- * Usage: <hostname> <port> <fail percent>
+ * Usage: <port> <fail percent>
  */
 public class WorkerParameters {
 
@@ -10,15 +13,21 @@ public class WorkerParameters {
     public final int failPercent;
 
     public WorkerParameters(String hostname, int port, int failPercent) {
-        this.name = hostname + "-" + port;
+        this.name = "worker-" + hostname + "-" + port;
         this.port = port;
         this.failPercent = failPercent;
     }
 
-    public static WorkerParameters parse(String[] args) {
-        String hostname = args[0];
-        int port = Integer.parseInt(args[1]);
-        int failPercent = Integer.parseInt(args[2]);
+    public static WorkerParameters parse(String[] args) throws IOException {
+        Process p = Runtime.getRuntime().exec("hostname");
+        Scanner s = new Scanner(p.getInputStream());
+
+        String hostname = s.nextLine();
+        s.close();
+
+        System.out.println("got hostname " + hostname);
+        int port = Integer.parseInt(args[0]);
+        int failPercent = Integer.parseInt(args[1]);
 
         return new WorkerParameters(hostname, port, failPercent);
     }
