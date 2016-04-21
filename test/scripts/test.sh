@@ -3,9 +3,9 @@
 rm -rf "$HOME/logs"
 mkdir "$HOME/logs"
 
-chunkSize=100000
+chunkSize=1000000
 cpm=8
-inputFile=1000000
+inputFile=10000000
 
 for redundancy in {1..4}; do
   for failProb in {0..90..10}; do
