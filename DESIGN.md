@@ -5,6 +5,7 @@
 - libthrift 0.9.3 + transitives for rpc
 - slf4j 1.7.12 for logging
 - metrics-core 3.1.0 for logging
+- rxjava 1.1.3 for frp and async
 
 
 ## Java 8
@@ -29,6 +30,13 @@ I use metrics-core from Dropwizard to measure how long a read or write
 request takes. It generates stats on the timers and writes them to a csv file.
 
 
+## RxJava
+
+I use RxJava to do functional reactive programming. This heps me get the logic
+and error handling correct for complex tasks (like sending concurrent tasks to
+multiple nodes and logging and retrying errors).
+
+
 ## Common
 
 ### ThriftClient
@@ -38,6 +46,39 @@ transport, a protocol, a client, and then close them. It also throws the
 checked exception TException on everything. So ThriftClient and ThriftFunction
 handle the boilerplate for every use case (including retries). I can pass a
 lambda of just the work I need done.
+
+### Data
+
+Data is the class that encapsulates access to the `work/input`, `work/intermediate`,
+and `work/output` folders.
+
+### Metrics
+
+Metrics encapsulates setting up and reporting metrics.
+
+## Master
+
+Master code is in `mapreduce.master`. It runs a thrift service called
+MasterService. It has 5 classes:
+
+- Master is the main class that launches a MasterServer and WorkerPool.
+- MasterParameters parses command line arguments.
+- MasterServer binds the socket and launches a thrift service.
+- MasterHandler implements the thrift service.
+  - It sets up clean meters for a each job.
+  - It splits the data into chunks.
+  - It sends sort requests to nodes from the worker pool.
+  - Every time it gets enough chunks sorted or partially merged, it will
+    send another merge request out till everything is fully merged.
+  - Once it has a fully merged chunk, it will expand it from the condensed
+    form.
+  - For all sort and merge requests, it handles proactive failure handling
+    by sending the requests to multiple workers, and retrying any requests
+    that fail.
+- WorkerPool keeps a list of workers and whether they're alive. It will 
+  heartbeat every worker each second, and update their liveness. A worker
+  is considered alive if it responded to the previous heartbeat. The pool
+  will return a random living worker when asked.
 
 ## Storage
 
