@@ -1,7 +1,5 @@
+csel-x31-01.cselabs.umn.edu
 csel-x31-01.cselabs.umn.edu:50001
-csel-x31-01.cselabs.umn.edu:50002
-csel-x31-01.cselabs.umn.edu:50003
 csel-x31-03.cselabs.umn.edu:50001
-csel-x31-03.cselabs.umn.edu:50002
-csel-x31-03.cselabs.umn.edu:50003
-csel-x31-03.cselabs.umn.edu:50004
+csel-x31-04.cselabs.umn.edu:50001
+csel-x31-07.cselabs.umn.edu:50001

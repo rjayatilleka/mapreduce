@@ -8,9 +8,7 @@ import atexit
 params = {
     'localHostname': sys.argv[1],
     'port': sys.argv[2],
-    'readQ': sys.argv[3],
-    'writeQ': sys.argv[4],
-    'servers': ' '.join(sys.argv[5:])
+    'failProb': sys.argv[3]
 }
 
 processes = {}
@@ -42,13 +40,13 @@ def runServer(name, args):
 
     print('Launched ' + name)
 
-def coordStorage(params):
-    name = 'coordStorage@' + params['localHostname'] + params['port']
-    args = ['bin/storage', params['port'], '-', params['readQ'], params['writeQ'], params['servers']]
+def worker(params):
+    name = 'worker-' + params['localHostname'] + '-' + params['port']
+    args = ['bin/worker', params['port'], params['failProb']]
     runServer(name, args)
 
 # Launch servers
-coordStorage(params)
+worker(params)
 
 # Wait
 try:

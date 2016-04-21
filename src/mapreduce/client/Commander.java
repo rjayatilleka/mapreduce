@@ -4,6 +4,7 @@ package mapreduce.client;
 import mapreduce.ThriftClient;
 import mapreduce.thrift.MasterInfo;
 import mapreduce.thrift.MasterService;
+import mapreduce.thrift.MergesortResult;
 import mapreduce.thrift.WorkerInfo;
 
 import java.util.ArrayList;
@@ -31,12 +32,19 @@ public class Commander {
     public void mergesort(String[] command) {
         String inputFilename = command[1];
 
-        String outputId = masterClient.with(client -> client.mergesort(inputFilename));
+        MergesortResult result = masterClient.with(client -> client.mergesort(inputFilename));
 
-        System.out.println("Output file = work/output/" + outputId);
+        double failedP = (result.failedTasks * 100.0) / result.totalTasks;
+
+        System.out.println("Output file = work/output/" + result.outputId);
+        System.out.println("Time elapsed = " + (result.jobTime / 1000000000.0) + " seconds");
+        System.out.println("Total tasks = " + result.totalTasks);
+        System.out.println("Failed tasks = " + result.failedTasks + " = " + failedP);
+
         System.out.println("\nDiff command =");
         System.out.print("diff work/input/" + inputFilename + "_sorted ");
-        System.out.println("work/output/" + outputId);
+        System.out.println("work/output/" + result.outputId);
+
     }
 
     public void workerInfo(String[] command) {

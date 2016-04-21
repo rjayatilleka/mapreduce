@@ -6,9 +6,7 @@ import com.codahale.metrics.Timer;
 import mapreduce.Data;
 import mapreduce.Metrics;
 import mapreduce.ThriftClient;
-import mapreduce.thrift.MasterInfo;
-import mapreduce.thrift.MasterService;
-import mapreduce.thrift.WorkerService;
+import mapreduce.thrift.*;
 import mapreduce.worker.WorkerHandler;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
@@ -65,7 +63,7 @@ public class MasterHandler implements MasterService.Iface {
     }
 
     @Override
-    public String mergesort(String inputFilename) throws TException {
+    public MergesortResult mergesort(String inputFilename) throws TException {
         log.info("mergesort, received, inputFilename = {}", inputFilename);
         meters = new Meters(jobNumber++);
 
@@ -94,11 +92,17 @@ public class MasterHandler implements MasterService.Iface {
                 .toBlocking()
                 .first();
 
-        timer.stop();
+
+        MergesortResult r = new MergesortResult(
+                expandedId,
+                timer.stop(),
+                meters.totalTasksCounter.getCount(),
+                meters.failedTasksCounter.getCount());
+
         Metrics.report();
 
         log.info("mergesort, done, outputId = {}", expandedId);
-        return expandedId;
+        return r;
     }
 
     private Observable<String> retryAndRedundant(Observable<String> unreliable) {

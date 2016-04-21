@@ -7,8 +7,10 @@ import atexit
 
 params = {
     'localHostname': sys.argv[1],
-    'port': sys.argv[2],
-    'coordinator': sys.argv[3]
+    'chunkSize': sys.argv[2],
+    'cpm': sys.argv[3],
+    'redundancy': sys.argv[4],
+    'servers': ' '.join(sys.argv[5:])
 }
 
 processes = {}
@@ -40,13 +42,13 @@ def runServer(name, args):
 
     print('Launched ' + name)
 
-def storage(params):
-    name = 'storage@' + params['localHostname'] + ':' + params['port']
-    args = ['bin/storage', params['port'], params['coordinator']]
+def master(params):
+    name = 'master-' + params['localHostname'] + '-' + params['port']
+    args = ['bin/master', params['chunkSize'], params['cpm'], params['redundancy'], params['servers']]
     runServer(name, args)
 
 # Launch servers
-storage(params)
+master(params)
 
 # Wait
 try:

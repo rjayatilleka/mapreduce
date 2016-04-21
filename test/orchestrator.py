@@ -10,14 +10,16 @@ import atexit
 username = sys.argv[1]
 config = [x.strip('\n') for x in open(sys.argv[2], 'r').readlines()]
 
-readQuorum = sys.argv[3]
-writeQuorum = sys.argv[4]
-coordinatorHost = config[0].split(':')[0]
+chunkSize = sys.argv[3]
+cpm = sys.argv[4]
+redundancy = sys.argv[5]
+failProb = sys.argv[6]
+masterHost = config[0]
 
-storageHosts = [x.split(':') for x in config] 
-coordinatorServerParam = ' '.join(config)
+workerHosts = [x.split(':') for x in config[1:]] 
+workerServerParam = ' '.join(config[1:])
 
-useSignal = (len(sys.argv) == 6)
+useSignal = (len(sys.argv) == 8)
 
 sshPrefix = 'ssh -o BatchMode=yes -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o LogLevel=quiet ' + username + '@'
 
@@ -34,7 +36,7 @@ def terminate():
 
 atexit.register(terminate)
 
-def runCoordStorageLauncher(host, port):
+def runMasterLauncher(host, port):
     pre = sshPrefix + host + ' "cd jaya0089-mapreduce && '
     post = '"'
 
@@ -45,38 +47,38 @@ def runCoordStorageLauncher(host, port):
     clearLogProc.wait()
 
     launcherCmd = ' '.join([
-        'python3 test/launchCoordStorage.py',
+        'python3 test/launchMaster.py',
         host,
-        port,
-        readQuorum,
-        writeQuorum,
-        coordinatorServerParam])
+        chunkSize,
+        cpm,
+        redundancy,
+        workerServerParam])
 
-    processes['coordStorage'] = subprocess.Popen(
+    processes['launch-master'] = subprocess.Popen(
             pre + launcherCmd + post,
             shell = True,
             stdin = subprocess.PIPE)
 
-def runStorageLauncher(host, port):
+def runWorkerLauncher(host, port):
     pre = sshPrefix + host + ' "cd jaya0089-mapreduce && '
     post = '"'
 
     launcherCmd = ' '.join([
-        'python3 test/launchStorage.py',
+        'python3 test/launchWorker.py',
         host,
         port,
-        coordinatorHost])
+        failProb])
 
-    processes['storage-' + host + '-' + port] = subprocess.Popen(
+    processes['launch-worker-' + host + '-' + port] = subprocess.Popen(
             pre + launcherCmd + post,
             shell = True,
             stdin = subprocess.PIPE)
 
 # Launch servers
-runCoordStorageLauncher(storageHosts[0][0], storageHosts[0][1])
+runMasterLauncher(masterHost, 50000)
 
-for hostport in storageHosts[1:]:
-    runStorageLauncher(hostport[0], hostport[1])
+for hostport in workerHosts:
+    runWorkerLauncher(hostport[0], hostport[1])
 
 # Wait
 if useSignal:

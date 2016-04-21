@@ -15,9 +15,16 @@ struct MasterInfo {
   3:required list<Address> servers;
 }
 
+struct MergesortResult {
+  1:required string outputId;
+  2:required i64 jobTime;
+  3:required i64 totalTasks;
+  4:required i64 failedTasks;
+}
+
 service MasterService {
   MasterInfo info(),
-  string mergesort(1:string inputFilename)
+  MergesortResult mergesort(1:string inputFilename)
 }
 
 struct WorkerInfo {
