@@ -3,10 +3,10 @@
 rm -rf "$HOME/logs"
 mkdir "$HOME/logs"
 
-for wq in {4..7}; do
+for redundancy in {4..7}; do
   rq=`expr 8 - $wq`
 
-  for percent in {10..90..10}; do
+  for percent in {0..90..10}; do
     filename="test/eval/${percent}percentWrites.txt"
 
     echo "Test case: $wq $rq $filename ----------"
