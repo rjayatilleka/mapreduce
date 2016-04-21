@@ -22,9 +22,6 @@ public class Commander {
     public void masterInfo() {
         MasterInfo info = masterClient.with(client -> client.info());
 
-        System.out.println("Chunk size = " + info.chunkSize);
-        System.out.println("Redundancy = " + info.redundancy);
-
         System.out.println("\nWorker servers -------");
         info.servers.forEach(System.out::println);
     }
