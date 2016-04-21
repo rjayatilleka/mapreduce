@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 rm -rf "$HOME/logs"
 mkdir "$HOME/logs"
 
