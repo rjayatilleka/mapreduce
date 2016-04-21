@@ -19,7 +19,8 @@ masterHost = config[0]
 workerHosts = [x.split(':') for x in config[1:]] 
 workerServerParam = ' '.join(config[1:])
 
-useSignal = False #(len(sys.argv) == 8)
+# Used to run in script. Add an extra argument to make orch wait on a signal
+useSignal = (len(sys.argv) == 8)
 
 sshPrefix = 'ssh -o BatchMode=yes -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o LogLevel=quiet ' + username + '@'
 
