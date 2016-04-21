@@ -56,6 +56,7 @@ and `work/output` folders.
 
 Metrics encapsulates setting up and reporting metrics.
 
+
 ## Master
 
 Master code is in `mapreduce.master`. It runs a thrift service called
@@ -80,42 +81,26 @@ MasterService. It has 5 classes:
   is considered alive if it responded to the previous heartbeat. The pool
   will return a random living worker when asked.
 
-## Storage
 
-Storage code is in `filesys.storage`. It runs a thrift service called
-StorageService. It has 6 classes:
+## Worker
 
-- Storage is the actual application. It launches a StorageServer and
-  optionally a CoordinatorServer.
-- StorageParameters handles argument parsing.
-- StorageServer binds the given socket and launches a thrift service.
-- StorageHandler implements the thrift service.
-  - It keeps a read-write lock internally for its own data (since sync
-    doesn't obtain the global write lock).
-  - When it gets a read/write request, it contacts the coordinator to
-    obtain the global lock and get a quorum. Then it does the read/write
-    and contacts the coordinator again to unlock.
-  - It also publishes a sync interface for the sync daemon.
-- VersionQuery takes care of contacting an entire quorum and finding which
-  has the highest version.
-- SyncDaemon runs in its own thread and will every 3 seconds pull data from
-  the other storages. Then it pushes it to its owner storage through the sync
-  interface.
+Worker code is in `mapreduce.worker`. It runs a thrift service called
+WorkerService and has 4 classes:
 
-
-## Coordinator
-
-Coordinator code is in `filesys.coordinator`. The coordinator is spawned by a
-Storage at localhost:50000.
-
-- CoordinatorServer runs the thrift service.
-- CoordinatorParameters handles argument parsing.
-- CoordinatorHandler implements the thrift service.
-  - It keeps a per-filename read-write lock using an in-order fairness policy.
-  - It creates quorums and locks and unlocks the read-write lock.
-- LockTaskManager handles a lock for a single filename. It launches a thread
-  to block on the lock, and uses semaphores to communicate with the Thrift
-  server's request threads.
+- Worker is the main class that launches a WorkerServer and metrics
+  reporting thread.
+- WorkerParameters parses command line arguments.
+- WorkerServer binds the socket and launches a thrift service.
+- WorkerHandler implements the thrift service.
+  - It responds to heartbeat checks.
+  - It times how long each sort and merge takes.
+  - It randomly (according to parameter) will throw a TaskFailException
+    on some requests.
+  - When sorting, instead of writing back a full sorted version of the input
+    like `0 0 2 3 3 3 4 ...`, it will write a condensed version `2 0 1 3 1 ...`.
+    This saves on disk space (though it doesn't solve all the quota issues.
+  - Also when merging, it takes in and produces condensed version files. The
+    master expands it back to the output at the end of the mergesort.
 
 
 ## Client
