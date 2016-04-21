@@ -17,10 +17,9 @@ uninstall:
 	@rm -rf ~/jaya0089-mapreduce
 
 takelogs:
-	rm -rf logs
-	cp -r ~/jaya0089-mapreduce/log logs
-	find ~/jaya0089-mapreduce/log -type f -delete
-	# mkdir -p ~/jaya0089-mapreduce/log/metrics
+	@rm -rf logs
+	@cp -r ~/jaya0089-mapreduce/log logs
+	@find ~/jaya0089-mapreduce/log -type f -delete
 
 test-output:
 	@rm -rf /tmp/testlogs
