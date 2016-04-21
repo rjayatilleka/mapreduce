@@ -43,7 +43,7 @@ def runServer(name, args):
     print('Launched ' + name)
 
 def master(params):
-    name = 'master-' + params['localHostname'] + '-' + params['port']
+    name = 'master-' + params['localHostname']
     args = ['bin/master', params['chunkSize'], params['cpm'], params['redundancy'], params['servers']]
     runServer(name, args)
 

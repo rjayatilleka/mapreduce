@@ -122,7 +122,7 @@ dist:
 dist/log: | dist
 	@mkdir dist/log
 
-dist/work: | dist
+dist/work: clean-output | dist
 	@cp -rf work dist/
 
 dist/log/metrics: | dist/log
