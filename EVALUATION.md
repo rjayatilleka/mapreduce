@@ -3,56 +3,37 @@
 The evaluation was done on a data set generated under the following
 conditions:
 
-- Seven storage servers running on two hosts.
-- Four clients performing the same 1000 requests each.
-- Four values for the write/read quorums were used. I varied Write from 4 to 7
-  and set Read equal to `(8 - Write)`. That is the minimum Read such that
-  `(Read + Write) > N`, and there's no point in raising Read past the minimum.
-  - Write = 4, Read = 4
-  - Write = 5, Read = 3
-  - Write = 6, Read = 2
-  - Write = 7, Read = 1
-- Nine values were used for the ratio of write to read requests. I set the
-  total percentage of write requests to 10%, 20%, 30%, 40%, 50%, 60%, 70%,
-  80%, and 90%.
-- 4 Quorum Sizes * 9 Read/Write Ratios = 36 Data points total for read latency
-  and write latency each.
+- Four worker servers running on different hosts each.
+- The input file used was the one with 10 million numbers (approx 48 MB).
+- The chunk size used was 1,000,000 bytes.
+- The chunks per merge used was 8 chunks.
+- Four values were used for the redundancy (number of concurrent requests for
+  proactive failure tolerance). r = 1, 2, 3, 4.
+- Ten values were used for the failure probability. These were 0%, 10%, 20%,
+  30%, 40%, 50%, 60%, 70%, 80%, and 90%.
 
 ## Plots
 
-I plotted the median read latencies and median write latencies on two graphs,
-which are below.
+I plotted the average time elapsed for each mergesort in the graph below:
 
-![Median read latencies](readLatency.png)
-
-![Median write latencies](writeLatency.png)
+![Average mergesort time elapsed](mergesort_time.png)
 
 
 ## Conclusion
 
-On read-heavy workloads, choosing a high write quorum and low read quorum 
-cuts off about 4 ms per read, but adds about 4 ms to each write. As expected,
-there is a linear progression between data points on the 10% write load.
+Honestly speaking, I don't understand the results I got. The time elapsed
+does increase significantly from 80% to 90%, but aside from that, the values
+are roughly the same at all failure probabilities. Because of variability
+in each line, it's difficult to tell what redundancy setting is better where.
 
-As the write load increases, the read AND write latencies of the 7-1 config
-rises rapidly. However, write latencies on the other configs stay roughly
-constant. Read latencies do grow, but not nearly as much as the 7-1.
+What I would do for a more in-depth evaluation would be to add more data points
+at each redundancy/failure probability setting, since right now it has 2 data
+points, and that leaves it vulnerable to things like a busy network. Also, there
+is the possibility that 4 workers isn't a good number for these settings, so I
+would try a few different sizes of the worker fleet. Finally, I picked redundancy
+vs failure probability because they were the most interesting from a distrubuted
+systems standpoint, but chunk size, chunks per merge, and fleet size are all
+potentially interesting parameters to vary.
 
-The reason that 7-1 causes such latency is probably because all servers have
-their internal write lock locked nearly constantly. And since the version
-number on the file is constantly rising, there is a great deal more syncing
-happening, which puts the write lock under even more stress. Adding the fact
-that each individual write takes longer because there are more servers to
-write to, and its not surprising the 7-1 config is so slow under write-heavy
-loads.
-
-The config most in favor of writes, 4-4, is becomes the best at read latency
-when write percentage is > 50%. It is becomes the best at write latency
-earlier, at > 30%.
-
-Overall, for extremely read-heavy loads (write percentage < 25%), 7-1 is the
-best config, as it minimizes read latency and write latencies stay low
-regardless of config. If write percentage > 50%, 4-4 is the best config, as
-the read latency is still low and write latency is minimized. When write
-percentage is between 25% and 50%, 5-3 and 6-2 are the best options, depending
-on what the workload is like and how much the requests take in total.
+Overall, the system was implemented quite well, albeit with confusing final results
+that can be attributed to lack of depth in the evaluation.
