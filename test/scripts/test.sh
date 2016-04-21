@@ -37,6 +37,9 @@ for redundancy in {1..4}; do
     cp -r logs "$HOME/logs/logs-${redundancy}-${failProb}"
     echo "copied logs"
 
+    find $HOME/work/intermediate -type f -delete
+    find $HOME/work/output -type f -delete
+
     echo $'----------\n\n'
   done
 done
